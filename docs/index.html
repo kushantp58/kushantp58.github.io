@@ -45,9 +45,11 @@
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
   body{
-    margin:0;background:var(--ink);color:var(--paper);
+    margin:0;background-color:var(--ink);color:var(--paper);
     font-family:var(--body);font-size:17px;line-height:1.6;
     -webkit-font-smoothing:antialiased;overflow-x:hidden;
+    background-image:radial-gradient(circle,rgba(55,70,85,.42) 1px,transparent 1px);
+    background-size:28px 28px;
   }
   a{color:inherit;text-decoration:none}
   img{display:block;max-width:100%}
@@ -76,8 +78,10 @@
   header.hero{position:relative;min-height:100vh;display:flex;align-items:center;overflow:hidden}
   #cloud{position:absolute;inset:0;width:100%;height:100%;z-index:0}
   .hero-veil{position:absolute;inset:0;z-index:1;pointer-events:none;
-    background:radial-gradient(120% 90% at 78% 30%,transparent 40%,var(--ink) 100%),
-      linear-gradient(180deg,rgba(15,19,24,.2) 0%,transparent 22%,transparent 72%,var(--ink) 100%)}
+    background:
+      radial-gradient(120% 90% at 78% 30%,transparent 40%,var(--ink) 100%),
+      linear-gradient(90deg,rgba(15,19,24,.92) 0%,rgba(15,19,24,.55) 36%,transparent 58%),
+      linear-gradient(180deg,rgba(15,19,24,.28) 0%,transparent 22%,transparent 72%,var(--ink) 100%)}
   .hero-inner{position:relative;z-index:2;width:100%;padding-top:90px;padding-bottom:60px}
   .hero h1{font-family:var(--display);font-weight:800;font-size:clamp(3.1rem,11vw,8.2rem);
     line-height:.9;letter-spacing:-.01em;margin:.34em 0 0;text-transform:uppercase}
@@ -728,60 +732,113 @@
   }, {threshold:0.4});
   secs.forEach(function(s){ if(s) spy.observe(s); });
 
-  // ---- LiDAR point-cloud hero ----
+  // ---- LiDAR point-cloud hero (enhanced) ----
   var canvas = document.getElementById('cloud');
   if(!canvas) return;
   var ctx = canvas.getContext('2d');
-  var DPR = Math.min(window.devicePixelRatio || 1, 2);
-  var W=0, H=0, pts=[], scanX=0, t=0;
-  function rand(a,b){ return a + Math.random()*(b-a); }
+  var DPR = Math.min(window.devicePixelRatio||1,2);
+  var W=0,H=0,pts=[],scanX=0,t=0,OX=0,OY=0,maxR=0;
+  function rand(a,b){ return a+Math.random()*(b-a); }
+
   function build(){
-    W = canvas.clientWidth; H = canvas.clientHeight;
-    canvas.width = W*DPR; canvas.height = H*DPR;
+    W=canvas.clientWidth; H=canvas.clientHeight;
+    canvas.width=W*DPR; canvas.height=H*DPR;
     ctx.setTransform(DPR,0,0,DPR,0,0);
-    pts = [];
-    var n = Math.min(360, Math.floor(W*H/4200));
+    OX=W*0.65; OY=H*0.48; maxR=Math.min(W,H)*0.42;
+    pts=[];
+    var n=Math.min(380,Math.floor(W*H/3600));
     for(var i=0;i<n;i++){
-      var depth = Math.random();
-      pts.push({x:rand(0,1),y:rand(0,1),z:depth,r:0.6+depth*1.9,base:0.10+depth*0.34,ph:Math.random()*Math.PI*2,sp:rand(0.15,0.5)});
+      var depth=Math.random();
+      var r=20+Math.random()*maxR*0.94, th=Math.random()*Math.PI*2;
+      var bx=(Math.random()<0.28)?rand(0,W):(OX+Math.cos(th)*r);
+      var by=(bx===OX+Math.cos(th)*r)?(OY+Math.sin(th)*r):rand(0,H);
+      pts.push({x:bx/W,y:by/H,z:depth,r:0.6+depth*1.8,base:0.08+depth*0.30,ph:Math.random()*Math.PI*2,sp:rand(0.15,0.48)});
     }
-    scanX = W*0.2;
+    scanX=W*0.18;
   }
+
   function draw(){
     ctx.clearRect(0,0,W,H);
-    ctx.strokeStyle='rgba(39,49,60,0.32)'; ctx.lineWidth=1;
-    var step=64;
-    for(var gx=step;gx<W;gx+=step){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,H);ctx.stroke();}
-    for(var gy=step;gy<H;gy+=step){ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(W,gy);ctx.stroke();}
-    if(!reduce){ scanX+=1.1; if(scanX>W*1.15) scanX=-W*0.1; }
-    var band=150;
+
+    // Polar grid: bearing spokes
+    ctx.save(); ctx.translate(OX,OY);
+    for(var bi=0;bi<12;bi++){
+      var ba=bi*Math.PI/6;
+      ctx.beginPath(); ctx.moveTo(0,0);
+      ctx.lineTo(Math.cos(ba)*maxR*1.04,Math.sin(ba)*maxR*1.04);
+      ctx.strokeStyle='rgba(39,49,60,.32)'; ctx.lineWidth=.5; ctx.stroke();
+    }
+    // Range rings
+    for(var ri=1;ri<=4;ri++){
+      var rr=maxR*ri/4;
+      ctx.beginPath(); ctx.arc(0,0,rr,0,Math.PI*2);
+      ctx.strokeStyle=ri===4?'rgba(39,49,60,.75)':'rgba(39,49,60,.38)';
+      ctx.lineWidth=ri===4?1.2:.7; ctx.stroke();
+      if(ri<4){
+        ctx.fillStyle='rgba(92,102,113,.5)';
+        ctx.font='8px JetBrains Mono,monospace';
+        ctx.fillText(ri*10+'m',4,-rr+10);
+      }
+    }
+    ctx.restore();
+
+    // Scan line sweep
+    if(!reduce){ scanX+=1.0; if(scanX>W*1.12) scanX=-W*0.08; }
+    var band=155;
+
+    // Points
     for(var i=0;i<pts.length;i++){
       var p=pts[i], px=p.x*W, py=p.y*H;
-      if(!reduce){ px+=Math.sin(t*0.0006*p.sp+p.ph)*6*p.z; py+=Math.cos(t*0.0005*p.sp+p.ph)*5*p.z; }
+      if(!reduce){ px+=Math.sin(t*0.0006*p.sp+p.ph)*5*p.z; py+=Math.cos(t*0.0005*p.sp+p.ph)*4*p.z; }
       var d=Math.abs(px-scanX), lit=reduce?0:Math.max(0,1-d/band);
-      var alpha=p.base+lit*0.55, radius=p.r+lit*1.4;
+      var alpha=p.base+lit*0.52, radius=p.r+lit*1.4;
       if(lit>0.05){
         ctx.fillStyle='rgba(255,122,26,'+alpha+')';
-        if(lit>0.4){ctx.shadowColor='rgba(255,122,26,0.6)';ctx.shadowBlur=6*lit;}else{ctx.shadowBlur=0;}
-      } else { ctx.shadowBlur=0; ctx.fillStyle='rgba(180,196,210,'+p.base+')'; }
+        if(lit>0.38){ctx.shadowColor='rgba(255,122,26,.62)';ctx.shadowBlur=6*lit;}else{ctx.shadowBlur=0;}
+      } else {
+        ctx.shadowBlur=0;
+        var dr=Math.round(75+p.z*55),dg=Math.round(100+p.z*28),db=Math.round(118+p.z*28);
+        ctx.fillStyle='rgba('+dr+','+dg+','+db+','+p.base+')';
+      }
       ctx.beginPath(); ctx.arc(px,py,radius,0,Math.PI*2); ctx.fill();
-      if(lit>0.55 && i%3===0){
-        ctx.shadowBlur=0; ctx.strokeStyle='rgba(255,122,26,'+(0.12*lit)+')';
+      if(lit>0.52&&i%3===0){
+        ctx.shadowBlur=0; ctx.strokeStyle='rgba(255,122,26,'+(0.11*lit)+')';
         ctx.beginPath(); ctx.moveTo(scanX,py); ctx.lineTo(px,py); ctx.stroke();
       }
     }
     ctx.shadowBlur=0;
+
+    // Scan gradient line
     if(!reduce){
       var grad=ctx.createLinearGradient(scanX-2,0,scanX+2,0);
-      grad.addColorStop(0,'rgba(255,122,26,0)'); grad.addColorStop(0.5,'rgba(255,122,26,0.5)'); grad.addColorStop(1,'rgba(255,122,26,0)');
+      grad.addColorStop(0,'rgba(255,122,26,0)');
+      grad.addColorStop(0.5,'rgba(255,122,26,.46)');
+      grad.addColorStop(1,'rgba(255,122,26,0)');
       ctx.fillStyle=grad; ctx.fillRect(scanX-2,0,4,H);
     }
+
+    // Sensor origin marker
+    ctx.save(); ctx.translate(OX,OY);
+    ctx.strokeStyle='rgba(255,122,26,.28)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(-20,0); ctx.lineTo(20,0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,-20); ctx.lineTo(0,20); ctx.stroke();
+    ctx.beginPath(); ctx.arc(0,0,3.5,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,122,26,.92)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(0,0,9,0,Math.PI*2);
+    ctx.strokeStyle='rgba(255,122,26,.32)'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.beginPath(); ctx.arc(0,0,17,0,Math.PI*2);
+    ctx.strokeStyle='rgba(255,122,26,.14)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.fillStyle='rgba(255,122,26,.6)';
+    ctx.font='8px JetBrains Mono,monospace';
+    ctx.fillText('SENSOR',15,-5);
+    ctx.restore();
   }
+
   var raf;
   function loop(now){ t=now; draw(); raf=requestAnimationFrame(loop); }
   function start(){ build(); draw(); if(raf) cancelAnimationFrame(raf); if(!reduce) raf=requestAnimationFrame(loop); }
   var rt;
-  window.addEventListener('resize', function(){ clearTimeout(rt); rt=setTimeout(start,180); });
+  window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(start,180); });
   start();
 })();
 </script>
