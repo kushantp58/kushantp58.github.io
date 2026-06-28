@@ -76,13 +76,14 @@
 
   /* ---------- HERO ---------- */
   header.hero{position:relative;min-height:100vh;display:flex;align-items:center;overflow:hidden}
-  #cloud{position:absolute;inset:0;width:100%;height:100%;z-index:0}
-  .hero-veil{position:absolute;inset:0;z-index:1;pointer-events:none;
+  .hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:.32}
+  #cloud{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+  .hero-veil{position:absolute;inset:0;z-index:2;pointer-events:none;
     background:
       radial-gradient(120% 90% at 78% 30%,transparent 40%,var(--ink) 100%),
-      linear-gradient(90deg,rgba(15,19,24,.92) 0%,rgba(15,19,24,.55) 36%,transparent 58%),
-      linear-gradient(180deg,rgba(15,19,24,.28) 0%,transparent 22%,transparent 72%,var(--ink) 100%)}
-  .hero-inner{position:relative;z-index:2;width:100%;padding-top:90px;padding-bottom:60px}
+      linear-gradient(90deg,rgba(15,19,24,.95) 0%,rgba(15,19,24,.60) 36%,transparent 58%),
+      linear-gradient(180deg,rgba(15,19,24,.35) 0%,transparent 20%,transparent 70%,var(--ink) 100%)}
+  .hero-inner{position:relative;z-index:3;width:100%;padding-top:90px;padding-bottom:60px}
   .hero h1{font-family:var(--display);font-weight:800;font-size:clamp(3.1rem,11vw,8.2rem);
     line-height:.9;letter-spacing:-.01em;margin:.34em 0 0;text-transform:uppercase}
   .hero h1 .l2{display:block;color:var(--paper)}
@@ -99,12 +100,12 @@
   .socials{display:flex;gap:22px;font-family:var(--mono);font-size:13px;letter-spacing:.03em}
   .socials a{color:var(--muted);transition:color .2s;border-bottom:1px solid transparent;padding-bottom:2px}
   .socials a:hover{color:var(--signal);border-color:var(--signal-line)}
-  .telemetry{position:absolute;right:28px;bottom:34px;z-index:2;font-family:var(--mono);font-size:11.5px;line-height:1.85;
+  .telemetry{position:absolute;right:28px;bottom:34px;z-index:3;font-family:var(--mono);font-size:11.5px;line-height:1.85;
     color:var(--muted);border-left:1px solid var(--signal-line);padding:2px 0 2px 14px;text-align:left}
   .telemetry span{color:var(--signal)}
   .telemetry b{color:var(--paper-dim);font-weight:500}
   @media(max-width:860px){.telemetry{display:none}}
-  .scroll-hint{position:absolute;left:28px;bottom:34px;z-index:2;font-family:var(--mono);font-size:11px;
+  .scroll-hint{position:absolute;left:28px;bottom:34px;z-index:3;font-family:var(--mono);font-size:11px;
     letter-spacing:.18em;color:var(--muted-2);text-transform:uppercase;display:flex;align-items:center;gap:10px}
   .scroll-hint .bar{width:34px;height:1px;background:var(--muted-2);position:relative;overflow:hidden}
   .scroll-hint .bar::after{content:"";position:absolute;inset:0;background:var(--signal);transform:translateX(-100%);animation:sweep 2.6s ease-in-out infinite}
@@ -264,7 +265,7 @@
   .hl-desc{font-family:var(--mono);font-size:10.5px;color:var(--muted);line-height:1.55}
 
   :focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:2px}
-  @media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}.reveal{opacity:1;transform:none;transition:none}}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}.reveal{opacity:1;transform:none;transition:none}.hero-video{display:none}}
 </style>
 </head>
 <body>
@@ -286,6 +287,9 @@
 </nav>
 
 <header class="hero" id="top">
+  <video class="hero-video" autoplay muted loop playsinline>
+    <source src="assets/img/photos/slam_test.mp4" type="video/mp4">
+  </video>
   <canvas id="cloud"></canvas>
   <div class="hero-veil"></div>
   <div class="hero-inner wrap">
