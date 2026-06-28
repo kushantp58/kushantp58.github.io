@@ -264,11 +264,41 @@
   .hl-title{font-family:var(--display);font-weight:700;font-size:13px;line-height:1.25;margin-bottom:6px}
   .hl-desc{font-family:var(--mono);font-size:10.5px;color:var(--muted);line-height:1.55}
 
+  /* ---------- SPOT CURSOR ---------- */
+  html,body,*{cursor:none!important}
+  #spot-cursor{position:fixed;top:0;left:0;pointer-events:none;z-index:9999;will-change:transform;transition:opacity .15s;opacity:0}
+  .s-leg{transform-box:fill-box;transform-origin:top center}
+  #spot-cursor.walking .s-fn,
+  #spot-cursor.walking .s-bf{animation:gait-a .42s ease-in-out infinite}
+  #spot-cursor.walking .s-ff,
+  #spot-cursor.walking .s-bn{animation:gait-b .42s ease-in-out infinite}
+  @keyframes gait-a{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
+  @keyframes gait-b{0%,100%{transform:rotate(12deg)}50%{transform:rotate(-12deg)}}
+  @keyframes cursor-ring{from{transform:scale(1);opacity:1}to{transform:scale(3.2);opacity:0}}
+  @media(hover:none),(pointer:coarse){#spot-cursor{display:none}html,body,*{cursor:auto!important}}
+
   :focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:2px}
   @media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}.reveal{opacity:1;transform:none;transition:none}.hero-video{display:none}}
 </style>
 </head>
 <body>
+
+<!-- Spot dog cursor -->
+<div id="spot-cursor" aria-hidden="true">
+  <svg viewBox="0 0 58 46" width="58" height="46" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+    <!-- Far-side legs (faded, drawn behind body) -->
+    <g class="s-leg s-bf"><polyline points="18,20 16,30 18,39" fill="none" stroke="rgba(255,122,26,.40)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g class="s-leg s-ff"><polyline points="36,20 38,30 36,39" fill="none" stroke="rgba(255,122,26,.40)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <!-- Body -->
+    <rect x="9" y="8" width="34" height="13" rx="4" fill="#FF7A1A"/>
+    <!-- Head / sensor payload -->
+    <rect x="43" y="6" width="10" height="10" rx="2" fill="#FF7A1A"/>
+    <circle cx="51" cy="10.5" r="1.8" fill="rgba(15,19,24,.9)"/>
+    <!-- Near-side legs (bright, drawn in front of body) -->
+    <g class="s-leg s-bn"><polyline points="14,21 12,31 14,40" fill="none" stroke="#FF7A1A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g class="s-leg s-fn"><polyline points="38,21 40,31 38,40" fill="none" stroke="#FF7A1A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>
+  </svg>
+</div>
 
 <nav id="nav">
   <div class="nav-inner">
@@ -913,6 +943,32 @@
   var rt;
   window.addEventListener('resize',function(){ clearTimeout(rt); rt=setTimeout(start,180); });
   start();
+
+  // Spot dog cursor
+  var cur = document.getElementById('spot-cursor');
+  if(cur && window.matchMedia('(hover:hover)').matches){
+    var walkTimer;
+    window.addEventListener('mousemove', function(e){
+      cur.style.opacity='1';
+      // hotspot = nose tip at SVG (51,10)
+      cur.style.transform='translate('+(e.clientX-51)+'px,'+(e.clientY-10)+'px)';
+      cur.classList.add('walking');
+      clearTimeout(walkTimer);
+      walkTimer=setTimeout(function(){ cur.classList.remove('walking'); }, 180);
+    });
+    document.addEventListener('mouseleave', function(){ cur.style.opacity='0'; });
+    document.addEventListener('mouseenter', function(){ cur.style.opacity='1'; });
+    document.addEventListener('mousedown', function(e){
+      var r=document.createElement('div');
+      r.style.cssText='position:fixed;left:'+(e.clientX-10)+'px;top:'+(e.clientY-10)+'px;'
+        +'width:20px;height:20px;border-radius:50%;border:1.5px solid rgba(255,122,26,.65);'
+        +'animation:cursor-ring .4s ease-out forwards;pointer-events:none;z-index:9998';
+      document.body.appendChild(r);
+      setTimeout(function(){ r.remove(); }, 420);
+    });
+  } else if(cur){
+    cur.style.display='none';
+  }
 })();
 </script>
 </body>
