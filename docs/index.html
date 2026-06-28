@@ -222,13 +222,15 @@
   /* ---------- WRITING ---------- */
   .write-head{display:flex;justify-content:space-between;align-items:baseline;gap:18px;flex-wrap:wrap;margin-bottom:22px}
   .write-head a{font-family:var(--mono);font-size:12.5px;color:var(--signal);border-bottom:1px solid var(--signal-line);padding-bottom:3px}
-  .write-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  .write-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
   .write{border:1px solid var(--line);border-radius:3px;padding:28px 26px;transition:border-color .25s,background .25s;display:block}
   .write:hover{border-color:var(--signal-line);background:var(--ink-2)}
+  .write-cta{border-style:dashed}
   .write .k{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-2)}
   .write h4{font-family:var(--display);font-weight:700;font-size:1.12rem;line-height:1.25;margin:14px 0 10px}
   .write p{color:var(--paper-dim);font-size:14.5px;margin:0 0 14px;line-height:1.5}
   .write .go{font-family:var(--mono);font-size:12px;color:var(--signal);display:inline-flex;gap:7px;align-items:center}
+  @media(max-width:900px){.write-grid{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:680px){.write-grid{grid-template-columns:1fr}}
 
   /* ---------- CONTACT ---------- */
@@ -753,6 +755,24 @@
         <a href="https://medium.com/@kushantp179" target="_blank" rel="noopener">All posts on Medium ↗</a>
       </div>
       <div class="write-grid">
+        <a class="write reveal" href="https://medium.com/@kushantp179/embarking-on-a-robotic-adventure-an-introduction-to-ros-robot-operating-system-1d7972ca249d" target="_blank" rel="noopener">
+          <span class="k">Robotics</span>
+          <h4>An Introduction to ROS (Robot Operating System)</h4>
+          <p>Nodes, topics, services, and the pub/sub architecture that powers modern robot software — a ground-up intro to ROS for engineers stepping into robotics.</p>
+          <span class="go">Read on Medium ↗</span>
+        </a>
+        <a class="write reveal" href="https://medium.com/@kushantp179/exploring-graph-slam-a-comprehensive-guide-to-simultaneous-localization-and-mapping-part-i-52281bbf6b9c" target="_blank" rel="noopener">
+          <span class="k">SLAM</span>
+          <h4>Exploring Graph SLAM — A Comprehensive Guide (Part I)</h4>
+          <p>Factor graphs, loop closure, and pose graph optimization — how robots build consistent maps of unknown environments by turning SLAM into a nonlinear least-squares problem.</p>
+          <span class="go">Read on Medium ↗</span>
+        </a>
+        <a class="write reveal" href="https://medium.com/@kushantp179/unlocking-the-power-of-slam-navigation-and-mapping-in-real-time-febb8313fb77" target="_blank" rel="noopener">
+          <span class="k">SLAM</span>
+          <h4>Unlocking SLAM: Navigation and Mapping in Real-Time</h4>
+          <p>How EKF-SLAM, particle filters, and sensor fusion combine so a robot can localize and map simultaneously — and what it takes to do this under real-time constraints.</p>
+          <span class="go">Read on Medium ↗</span>
+        </a>
         <a class="write reveal" href="https://medium.com/@kushantp179" target="_blank" rel="noopener">
           <span class="k">Essay</span>
           <h4>Algorithmic Bias — A Tool of Manipulation</h4>
@@ -764,6 +784,12 @@
           <h4>GANs — The Most Interesting Idea in 10 Years of ML</h4>
           <p>A tour through generative adversarial networks: generators, discriminators, backprop, and the wide world of things you can build once a model can imagine.</p>
           <span class="go">Read on Medium ↗</span>
+        </a>
+        <a class="write write-cta reveal" href="https://medium.com/@kushantp179" target="_blank" rel="noopener">
+          <span class="k">Medium</span>
+          <h4>More on @kushantp179</h4>
+          <p>All posts covering robotics, SLAM, autonomous systems, and machine learning.</p>
+          <span class="go">View all posts ↗</span>
         </a>
       </div>
     </div>
