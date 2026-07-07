@@ -185,9 +185,9 @@
   @media(max-width:560px){.gallery{column-count:1}}
   .shot{position:relative;break-inside:avoid;margin:0 0 14px;border:1px solid var(--line);
     border-radius:3px;overflow:hidden;background:var(--ink-2);display:block}
-  .shot img{width:100%;height:auto;display:block;filter:grayscale(.12) contrast(1.03);
+  .shot img,.shot video{width:100%;height:auto;display:block;filter:grayscale(.12) contrast(1.03);
     transition:transform .55s ease,filter .4s ease}
-  .shot:hover img{transform:scale(1.045);filter:none}
+  .shot:hover img,.shot:hover video{transform:scale(1.045);filter:none}
   .shot figcaption{position:absolute;left:0;right:0;bottom:0;padding:38px 16px 15px;pointer-events:none;
     background:linear-gradient(transparent,rgba(8,11,14,.55) 45%,rgba(8,11,14,.92))}
   .shot .cap-k{font-family:var(--mono);font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--signal);display:block;margin-bottom:5px}
@@ -319,9 +319,6 @@
 </nav>
 
 <header class="hero" id="top">
-  <video class="hero-video" autoplay muted loop playsinline>
-    <source src="assets/img/photos/slam_test.mp4" type="video/mp4">
-  </video>
   <canvas id="cloud"></canvas>
   <div class="hero-veil"></div>
   <div class="hero-inner wrap">
@@ -619,6 +616,13 @@
     <div class="wrap">
       <div class="sec-head reveal"><span class="sec-num">04</span><h2 class="sec-title">In the Field</h2><span class="sec-rule"></span></div>
       <div class="gallery">
+
+        <figure class="shot reveal">
+          <video autoplay muted loop playsinline>
+            <source src="assets/img/photos/slam_test.mp4" type="video/mp4">
+          </video>
+          <figcaption><span class="cap-k">SLAM Demo</span><span class="cap-t">Real-time simultaneous localization and mapping — live robot run</span></figcaption>
+        </figure>
 
         <figure class="shot reveal">
           <img src="assets/img/photos/field-brookhaven.jpg" alt="Kushant Patel presenting the Automated Sample Exchangers research poster at NSLS-II, Brookhaven" loading="lazy">
