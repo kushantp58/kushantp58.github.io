@@ -78,6 +78,18 @@
   header.hero{position:relative;min-height:100vh;display:flex;align-items:center;overflow:hidden}
   .hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:.32}
   #cloud{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+  .hero-slides{position:absolute;inset:0;z-index:0;pointer-events:none}
+  .hero-slide{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;
+    transform:scale(1.04);transition:opacity 1.6s ease,transform 11s linear;filter:grayscale(.15) contrast(1.05)}
+  .hero-slide.on{opacity:.42;transform:scale(1.12)}
+  .slide-cap{position:absolute;top:96px;right:28px;z-index:3;text-align:right;max-width:340px;
+    font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;transition:opacity .6s ease}
+  .slide-cap .cap-k{display:block;color:var(--signal);text-transform:uppercase;letter-spacing:.15em;margin-bottom:5px}
+  .slide-cap .cap-t{color:var(--paper-dim);font-family:inherit;line-height:1.5}
+  .slide-dots{display:flex;gap:6px;justify-content:flex-end;margin-top:10px}
+  .slide-dots i{width:16px;height:2px;background:var(--line);transition:background .4s}
+  .slide-dots i.on{background:var(--signal)}
+  @media(max-width:860px){.slide-cap{display:none}}
   .hero-veil{position:absolute;inset:0;z-index:2;pointer-events:none;
     background:
       radial-gradient(120% 90% at 78% 30%,transparent 40%,var(--ink) 100%),
@@ -321,8 +333,10 @@
 </nav>
 
 <header class="hero" id="top">
+  <div class="hero-slides" id="heroSlides"></div>
   <canvas id="cloud"></canvas>
   <div class="hero-veil"></div>
+  <div class="slide-cap" id="slideCap" aria-live="polite"></div>
   <div class="hero-inner wrap">
     <div>
       <span class="eyebrow">Perception · Motion Planning · Control Systems</span>
@@ -862,6 +876,47 @@
     });
   }, {threshold:0.4});
   secs.forEach(function(s){ if(s) spy.observe(s); });
+
+  // ---- Hero slideshow (pulls media from the In the Field gallery) ----
+  (function(){
+    var box=document.getElementById('heroSlides'), cap=document.getElementById('slideCap');
+    if(!box) return;
+    var items=[];
+    document.querySelectorAll('#field .shot').forEach(function(f){
+      var m=f.querySelector('img,video source'); if(!m) return;
+      items.push({video:m.tagName==='SOURCE', src:m.getAttribute('src'),
+        k:(f.querySelector('.cap-k')||{}).textContent||'', t:(f.querySelector('.cap-t')||{}).textContent||''});
+    });
+    if(!items.length) return;
+    var els=items.map(function(it){
+      var el=document.createElement(it.video?'video':'img');
+      el.className='hero-slide'; el.setAttribute('aria-hidden','true');
+      if(it.video){ el.muted=true; el.loop=true; el.playsInline=true; el.preload='none'; }
+      else el.alt='';
+      box.appendChild(el); return el;
+    });
+    var cur=-1;
+    function load(i){ var el=els[i]; if(!el.getAttribute('src')) el.setAttribute('src',items[i].src); }
+    function show(i){
+      load(i);
+      if(cur>-1){ els[cur].classList.remove('on'); if(items[cur].video) els[cur].pause(); }
+      cur=i; var el=els[i];
+      if(items[i].video){ var p=el.play(); if(p&&p.catch) p.catch(function(){}); }
+      void el.offsetWidth; el.classList.add('on');
+      cap.style.opacity=0;
+      setTimeout(function(){
+        cap.innerHTML='<span class="cap-k"></span><span class="cap-t"></span><div class="slide-dots">'+
+          items.map(function(_,j){return '<i'+(j===i?' class="on"':'')+'></i>';}).join('')+'</div>';
+        cap.querySelector('.cap-k').textContent=items[i].k;
+        cap.querySelector('.cap-t').textContent=items[i].t;
+        cap.style.opacity=1;
+      },300);
+      load((i+1)%items.length);
+    }
+    show(0);
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches || items.length<2) return;
+    setInterval(function(){ if(!document.hidden) show((cur+1)%items.length); },10000);
+  })();
 
   // ---- ROS2 Node Graph hero ----
   var canvas = document.getElementById('cloud');
