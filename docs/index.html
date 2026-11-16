@@ -192,6 +192,8 @@
     background:linear-gradient(transparent,rgba(8,11,14,.55) 45%,rgba(8,11,14,.92))}
   .shot .cap-k{font-family:var(--mono);font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--signal);display:block;margin-bottom:5px}
   .shot .cap-t{font-size:14px;color:var(--paper);line-height:1.35;font-weight:500}
+  .shot iframe{width:100%;aspect-ratio:16/9;border:0;display:block}
+  .shot-embed figcaption{position:static;padding:14px 16px 15px;background:none;pointer-events:auto}
 
   /* ---------- PUBLICATIONS ---------- */
   .pub{display:grid;grid-template-columns:150px 1fr 40px;gap:28px;align-items:start;
@@ -616,6 +618,11 @@
     <div class="wrap">
       <div class="sec-head reveal"><span class="sec-num">04</span><h2 class="sec-title">In the Field</h2><span class="sec-rule"></span></div>
       <div class="gallery">
+
+        <figure class="shot shot-embed reveal">
+          <iframe src="https://www.youtube-nocookie.com/embed/teOCRko7wDs" title="Robots behind the research - interview with Kushant Patel" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+          <figcaption><span class="cap-k">Robot Talk Podcast</span><span class="cap-t"><a href="https://youtu.be/teOCRko7wDs" target="_blank" rel="noopener">Robots behind the research — interview with Kushant Patel ↗</a></span></figcaption>
+        </figure>
 
         <figure class="shot reveal">
           <video autoplay muted loop playsinline>
